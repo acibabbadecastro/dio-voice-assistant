@@ -1,6 +1,6 @@
-openai>=0.27.0
-gTTS>=2.3.0
-SpeechRecognition>=3.10.0
-pygame>=2.5.0
-python-dotenv>=1.0.0
-PyAudio>=0.2.11
+openai
+gTTS
+SpeechRecognition
+pygame
+python-dotenv
+PyAudio
