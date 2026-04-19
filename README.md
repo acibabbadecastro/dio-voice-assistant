@@ -1,22 +1,43 @@
-# 🎙️ Assistente de Voz Inteligente
+# Assistente de Voz Inteligente
 
 Um assistente pessoal que entende sua voz e responde de forma natural, combinando as melhores tecnologias de IA disponíveis.
 
-> 💡 **Projeto desenvolvido durante o bootcamp DIO** - Explorando integração entre Speech-to-Text, processamento de linguagem natural e Text-to-Speech.
+> Projeto desenvolvido durante o bootcamp DIO - Explorando integração entre Speech-to-Text, processamento de linguagem natural e Text-to-Speech.
 
 ---
 
-## ✨ O que ele faz?
+## O que ele faz?
 
-- **🎤 Ouve você** - Capta sua voz e converte para texto usando a API Whisper da OpenAI
-- **🧠 Entende e processa** - Usa o ChatGPT para gerar respostas inteligentes e contextuais
-- **🔊 Responde em voz** - Transforma o texto em áudio usando Google TTS para uma conversa natural
+- **Ouve você** - Capta sua voz e converte para texto usando a API Whisper da OpenAI
+- **Entende e processa** - Usa o ChatGPT para gerar respostas inteligentes e contextuais
+- **Responde em voz** - Transforma o texto em áudio usando Google TTS para uma conversa natural
 
 Tudo em tempo real, direto no seu computador!
 
 ---
 
-## 🚀 Tecnologias Utilizadas
+## Para Professores - Como Testar
+
+**Atenção:** Para testar este projeto, você precisa de uma API Key da OpenAI.
+
+### Passo a passo para criar sua API Key gratuita:
+
+1. Acesse: https://platform.openai.com/api-keys
+2. Crie uma conta (é gratuita e inclui créditos iniciais)
+3. Clique em "Create new secret key"
+4. Copie a chave gerada (começa com `sk-`)
+5. Cole a chave no arquivo `.env` ou direto no código onde indicado
+
+**Importante:** Cada pessoa deve usar sua própria API Key. Não compartilhe chaves.
+
+### Links do Projeto:
+
+- **Repositório:** https://github.com/acibabbadecastro/dio-voice-assistant
+- **Notebook Colab:** https://colab.research.google.com/github/acibabbadecastro/dio-voice-assistant/blob/main/assistente_voz.ipynb
+
+---
+
+## Tecnologias Utilizadas
 
 | Tecnologia | Função |
 |------------|--------|
@@ -28,7 +49,7 @@ Tudo em tempo real, direto no seu computador!
 
 ---
 
-## 📦 Instalação
+## Instalação
 
 ### Pré-requisitos
 - Python 3.8 ou superior
@@ -65,11 +86,11 @@ pip install -r requirements.txt
 echo "OPENAI_API_KEY=sua_chave_aqui" > .env
 ```
 
-> 🔑 **Onde conseguir a chave?** Acesse [platform.openai.com/api-keys](https://platform.openai.com/api-keys) e crie uma chave gratuita (inclui créditos iniciais)
+> Onde conseguir a chave? Acesse [platform.openai.com/api-keys](https://platform.openai.com/api-keys) e crie uma chave gratuita (inclui créditos iniciais)
 
 ---
 
-## 💻 Como usar
+## Como usar
 
 Execute o assistente:
 
@@ -88,31 +109,30 @@ python assistant.py
 
 ---
 
-## 🎯 Exemplo de uso
+## Exemplo de uso
 
 ```
-🎯 Iniciando assistente...
+Iniciando assistente...
 Calibrando microfone para o ambiente (aguarde 2 segundos)
-✓ Pronto! Estou te ouvindo.
+Pronto! Estou te ouvindo.
 
-🎤 Ouvindo... (processando...)
-👤 Você: "Qual a previsão do tempo hoje?"
+Ouvindo... (processando...)
+Você: "Qual a capital do Brasil?"
 
-🧠 Pensando... ✓
-🤖 Assistente: "Desculpe, não tenho acesso à internet em tempo real para 
-                verificar a previsão do tempo. Mas posso ajudar com outras 
-                coisas!"
+Pensando... 
+Assistente: "A capital do Brasil é Brasília."
 
-🔊 [Resposta falada em voz alta]
+[Resposta falada em voz alta]
 ```
 
 ---
 
-## 🛠️ Estrutura do projeto
+## Estrutura do projeto
 
 ```
 .
 ├── assistant.py              # Código principal do assistente
+├── assistente_voz.ipynb      # Notebook para Google Colab
 ├── requirements.txt          # Dependências Python
 ├── .env.example             # Exemplo de configuração
 ├── .gitignore               # Arquivos ignorados pelo Git
@@ -123,7 +143,7 @@ Calibrando microfone para o ambiente (aguarde 2 segundos)
 
 ---
 
-## 🔧 Personalização
+## Personalização
 
 Quer mudar o idioma ou ajustar algum comportamento? É simples:
 
@@ -136,7 +156,7 @@ assistente = AssistenteVoz(idioma='es')  # Para espanhol
 
 ---
 
-## ⚠️ Limitações
+## Limitações
 
 - Requer conexão com internet para funcionar
 - A qualidade do reconhecimento depende do microfone
@@ -144,16 +164,16 @@ assistente = AssistenteVoz(idioma='es')  # Para espanhol
 
 ---
 
-## 📝 Licença
+## Licença
 
 Este projeto foi desenvolvido para fins educacionais durante o bootcamp DIO.
 
-Sinta-se livre para usar, modificar e distribuir! 🚀
+Sinta-se livre para usar, modificar e distribuir!
 
 ---
 
-## 🙋 Autor
+## Autor
 
-**Desenvolvido com 💻 e ☕ durante o bootcamp DIO**
+**Acib ABBADE**
 
-*Abril/2026*
+Desenvolvido durante o bootcamp DIO - Abril/2026
