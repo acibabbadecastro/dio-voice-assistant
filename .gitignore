@@ -1,0 +1,37 @@
+# Ambiente virtual
+venv/
+env/
+ENV/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Arquivos de ambiente (contém secrets!)
+.env
+.env.local
+.env.*.local
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Arquivos temporários
+*.tmp
+*.temp
+/temp/
+/tmp/
+
+# Áudio temporário
+*.wav
+*.mp3
+
+# Logs
+*.log
+logs/
