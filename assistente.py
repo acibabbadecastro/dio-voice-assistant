@@ -18,7 +18,7 @@ try:
     import pygame
     from dotenv import load_dotenv
 except ImportError as e:
-    print(f"Ops! Parece que falta alguma dependência: {e}")
+    print(f"Opa, parece que falta alguma biblioteca: {e}")
     print("Rode primeiro: pip install -r requirements.txt")
     sys.exit(1)
 
@@ -40,17 +40,17 @@ class AssistenteVoz:
         self.rec = sr.Recognizer()
         self.mic = sr.Microphone()
         
-        print("\n🎯 Iniciando assistente...")
+        print("\nIniciando o assistente...")
         print("Calibrando microfone para o ambiente (aguarde 2 segundos)")
         
         with self.mic as source:
             self.rec.adjust_for_ambient_noise(source, duration=2)
             
-        print("✓ Pronto! Estou te ouvindo.\n")
+        print("Pronto! Pode falar.\n")
         
     def escutar(self):
         """Captura áudio do microfone e converte para texto"""
-        print("🎤 Ouvindo...", end=" ", flush=True)
+        print("Ouvindo...", end=" ", flush=True)
         
         with self.mic as source:
             try:
@@ -74,7 +74,7 @@ class AssistenteVoz:
             
             texto = resultado['text'].strip()
             if texto:
-                print(f"👤 Você: \"{texto}\"")
+                print(f"Voce disse: {texto}")
             
             os.remove(tmp_path)
             return texto
@@ -89,7 +89,7 @@ class AssistenteVoz:
         if not mensagem:
             return None
             
-        print("🧠 Pensando...", end=" ", flush=True)
+        print("Pensando...", end=" ", flush=True)
         
         try:
             resposta = openai.ChatCompletion.create(
@@ -103,8 +103,8 @@ class AssistenteVoz:
             )
             
             texto = resposta.choices[0].message.content.strip()
-            print("✓")
-            print(f"🤖 Assistente: \"{texto}\"\n")
+            print("ok")
+            print(f"Assistente: {texto}\n")
             return texto
             
         except Exception as e:
@@ -145,9 +145,9 @@ class AssistenteVoz:
     
     def executar(self):
         """Loop principal do assistente"""
-        print("=" * 55)
-        print("  🎙️  Assistente de Voz - DIO Bootcamp")
-        print("=" * 55)
+        print("=" * 50)
+        print("Assistente de Voz - Bootcamp DIO")
+        print("=" * 50)
         print("\nDicas:")
         print("  • Fale naturalmente, não precisa ser formal")
         print("  • Digite 'texto' para desativar a voz")
