@@ -1,41 +1,38 @@
 # Assistente de Voz com IA
 
-Projeto do bootcamp DIO - Assistente que ouve, entende e responde por voz usando ChatGPT + Whisper + gTTS.
+Projeto DIO usando Python + JavaScript. Assistente que ouve, entende e responde por voz.
 
-## Arquivos
+## Versões disponíveis
 
-- `assistente.py` - Código principal (execute este)
-- `requirements.txt` - Dependências para instalar
-- `README.md` - Esta documentação
+### 1. Local (Python puro)
+Roda no seu computador, sem navegador.
+- `assistente.py` - Código principal
+- Execute: `python assistente.py`
 
-## Como usar
+### 2. Google Colab (Python + JavaScript)
+Roda no navegador, usa JavaScript para acessar o microfone.
+- `assistente_colab.ipynb` - Notebook para importar no Colab
 
-### 1. Instale as dependências
+## Instalação (versão local)
+
 ```bash
 pip install -r requirements.txt
 ```
 
-### 2. Configure sua API Key
-Crie um arquivo `.env` na mesma pasta com:
+## Configuração
+
+Crie um arquivo `.env` com sua API Key:
 ```
 OPENAI_API_KEY=sua_chave_aqui
 ```
 
-Ou obtenha uma chave gratuita em: https://platform.openai.com/api-keys
-
-### 3. Execute
-```bash
-python assistente.py
-```
-
-Fale algo quando aparecer "Ouvindo..."
+Ou obtenha em: https://platform.openai.com/api-keys
 
 ## Tecnologias
 
-- **Whisper (OpenAI)** - Reconhecimento de voz
-- **ChatGPT** - Processamento de linguagem
-- **gTTS** - Síntese de voz
+- **Python:** Processamento (Whisper, ChatGPT, gTTS)
+- **JavaScript:** Gravação de áudio no navegador (Colab)
 
 ---
 
-*Projeto desenvolvido durante o bootcamp DIO - Abril/2026*
+*Projeto DIO - Abril/2026*
