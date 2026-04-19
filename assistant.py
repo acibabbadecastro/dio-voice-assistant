@@ -1,183 +1,232 @@
 #!/usr/bin/env python3
 """
-DIO Bootcamp - Assistente de Voz com ChatGPT
-Tecnologias: Whisper (OpenAI) + ChatGPT + gTTS (Google TTS)
-Autor: Acib ABBADE
-Data: 2026-04-19
+Assistente de Voz Inteligente
+Um projeto que combina reconhecimento de fala com IA para conversas naturais
+
+Desenvolvido para o bootcamp DIO - Abril/2026
 """
 
 import os
-import openai
-from gtts import gTTS
-import speech_recognition as sr
-import pygame
-import tempfile
-from dotenv import load_dotenv
+import sys
+import time
+from pathlib import Path
 
-# Carregar variáveis de ambiente
+try:
+    import openai
+    from gtts import gTTS
+    import speech_recognition as sr
+    import pygame
+    from dotenv import load_dotenv
+except ImportError as e:
+    print(f"Ops! Parece que falta alguma dependência: {e}")
+    print("Rode primeiro: pip install -r requirements.txt")
+    sys.exit(1)
+
+# Carrega as configurações do arquivo .env
 load_dotenv()
 
-# Configurar API OpenAI
-openai.api_key = os.getenv('OPENAI_API_KEY')
-
-class VoiceAssistant:
-    """Assistente virtual com conversação por voz usando ChatGPT + Whisper + gTTS"""
+class AssistenteVoz:
+    """
+    Assistente pessoal que entende voz e responde de forma natural.
+    Combina tecnologias da OpenAI com síntese de voz do Google.
+    """
     
-    def __init__(self, language='pt-br'):
-        self.language = language
-        self.recognizer = sr.Recognizer()
-        self.microphone = sr.Microphone()
+    def __init__(self, idioma='pt'):
+        self.idioma = idioma
+        self.ouvindo = False
+        self.modo_voz_ativo = True
         
-        # Ajustar para ruído ambiente
-        print("🎤 Calibrando microfone... Aguarde...")
-        with self.microphone as source:
-            self.recognizer.adjust_for_ambient_noise(source, duration=2)
-        print("✅ Microfone calibrado!")
-    
-    def listen(self):
-        """Ouvir áudio do microfone e converter para texto usando Whisper"""
-        print("\n🎤 Ouvindo... (fale agora)")
+        # Configura o reconhecedor de fala
+        self.rec = sr.Recognizer()
+        self.mic = sr.Microphone()
         
-        with self.microphone as source:
-            audio = self.recognizer.listen(source, timeout=5, phrase_time_limit=10)
+        print("\n🎯 Iniciando assistente...")
+        print("Calibrando microfone para o ambiente (aguarde 2 segundos)")
         
-        # Salvar áudio temporariamente
-        with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as temp_audio:
-            temp_audio.write(audio.get_wav_data())
-            temp_audio_path = temp_audio.name
+        with self.mic as source:
+            self.rec.adjust_for_ambient_noise(source, duration=2)
+            
+        print("✓ Pronto! Estou te ouvindo.\n")
+        
+    def escutar(self):
+        """Captura áudio do microfone e converte para texto"""
+        print("🎤 Ouvindo...", end=" ", flush=True)
+        
+        with self.mic as source:
+            try:
+                audio = self.rec.listen(source, timeout=10, phrase_time_limit=8)
+            except sr.WaitTimeoutError:
+                print("(silêncio)")
+                return None
+                
+        print("(processando...)")
+        
+        # Salva temporariamente para enviar ao Whisper
+        import tempfile
+        with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as tmp:
+            tmp.write(audio.get_wav_data())
+            tmp_path = tmp.name
         
         try:
-            # Usar Whisper para transcrever
-            with open(temp_audio_path, 'rb') as audio_file:
-                transcript = openai.Audio.transcribe("whisper-1", audio_file)
+            # Usa a IA da OpenAI para entender o que foi dito
+            with open(tmp_path, 'rb') as f:
+                resultado = openai.Audio.transcribe("whisper-1", f)
             
-            text = transcript['text'].strip()
-            print(f"📝 Você disse: {text}")
+            texto = resultado['text'].strip()
+            if texto:
+                print(f"👤 Você: \"{texto}\"")
             
-            # Limpar arquivo temporário
-            os.unlink(temp_audio_path)
-            
-            return text
+            os.remove(tmp_path)
+            return texto
             
         except Exception as e:
-            print(f"❌ Erro na transcrição: {e}")
-            os.unlink(temp_audio_path)
+            print(f"Não consegui entender direito: {e}")
+            os.remove(tmp_path)
             return None
     
-    def ask_gpt(self, question):
-        """Enviar pergunta para ChatGPT e obter resposta"""
-        try:
-            print("🤖 Pensando...")
+    def pensar(self, mensagem):
+        """Envia a mensagem para o ChatGPT e recebe a resposta"""
+        if not mensagem:
+            return None
             
-            response = openai.ChatCompletion.create(
+        print("🧠 Pensando...", end=" ", flush=True)
+        
+        try:
+            resposta = openai.ChatCompletion.create(
                 model="gpt-3.5-turbo",
                 messages=[
-                    {"role": "system", "content": "Você é um assistente útil e amigável que responde em português brasileiro de forma natural e conversacional."},
-                    {"role": "user", "content": question}
+                    {"role": "system", "content": "Você é um assistente amigável e prestativo que conversa de forma natural e descontraída em português brasileiro. Respostas curtas e diretas, mas sempre cordiais."},
+                    {"role": "user", "content": mensagem}
                 ],
-                max_tokens=150,
-                temperature=0.7
+                max_tokens=200,
+                temperature=0.8
             )
             
-            answer = response.choices[0].message.content.strip()
-            print(f"💬 Resposta: {answer}")
-            return answer
+            texto = resposta.choices[0].message.content.strip()
+            print("✓")
+            print(f"🤖 Assistente: \"{texto}\"\n")
+            return texto
             
         except Exception as e:
-            print(f"❌ Erro ao consultar ChatGPT: {e}")
-            return "Desculpe, não consegui processar sua pergunta agora."
+            print(f"Ops, deu algum problema: {e}")
+            return "Desculpa, minha cabeça deu uma travada aqui. Pode repetir?"
     
-    def speak(self, text):
-        """Converter texto em fala usando gTTS (Google Text-to-Speech)"""
+    def falar(self, texto):
+        """Converte o texto em áudio e reproduz"""
+        if not texto or not self.modo_voz_ativo:
+            return
+            
         try:
-            print("🔊 Gerando áudio...")
+            # Cria o áudio usando o Google TTS
+            tts = gTTS(text=texto, lang=self.idioma, slow=False)
             
-            # Criar arquivo de áudio temporário
-            tts = gTTS(text=text, lang=self.language[:2], slow=False)
+            # Salva temporariamente
+            import tempfile
+            with tempfile.NamedTemporaryFile(suffix=".mp3", delete=False) as tmp:
+                arquivo_audio = tmp.name
             
-            with tempfile.NamedTemporaryFile(suffix=".mp3", delete=False) as temp_mp3:
-                temp_path = temp_mp3.name
+            tts.save(arquivo_audio)
             
-            tts.save(temp_path)
-            
-            # Reproduzir áudio
+            # Reproduz o áudio
             pygame.mixer.init()
-            pygame.mixer.music.load(temp_path)
+            pygame.mixer.music.load(arquivo_audio)
             pygame.mixer.music.play()
             
-            # Aguardar término
+            # Aguarda terminar
             while pygame.mixer.music.get_busy():
-                pygame.time.Clock().tick(10)
+                time.sleep(0.1)
             
-            # Limpar
+            # Limpa os recursos
             pygame.mixer.quit()
-            os.unlink(temp_path)
+            os.remove(arquivo_audio)
             
         except Exception as e:
-            print(f"❌ Erro ao gerar áudio: {e}")
+            print(f"[Não consegui falar: {e}]")
     
-    def run(self):
+    def executar(self):
         """Loop principal do assistente"""
-        print("=" * 50)
-        print("🤖 ASSISTENTE DE VOZ DIO - ChatGPT + Whisper + gTTS")
-        print("=" * 50)
-        print("\nComandos disponíveis:")
-        print("- Diga 'sair' ou 'tchau' para encerrar")
-        print("- Diga 'modo texto' para desativar voz")
-        print("- Diga 'modo voz' para reativar voz\n")
+        print("=" * 55)
+        print("  🎙️  Assistente de Voz - DIO Bootcamp")
+        print("=" * 55)
+        print("\nDicas:")
+        print("  • Fale naturalmente, não precisa ser formal")
+        print("  • Digite 'texto' para desativar a voz")
+        print("  • Digite 'voz' para voltar a falar")
+        print("  • Diga 'tchau' para encerrar")
+        print("-" * 55 + "\n")
         
-        modo_voz = True
+        # Saudação inicial
+        saudacao = "Oi! Tudo bem? Estou aqui pra ajudar. O que você precisa?"
+        print(f"🤖 Assistente: \"{saudacao}\"")
+        self.falar(saudacao)
         
         while True:
-            # Ouvir pergunta
-            text = self.listen()
+            # Captura o que foi dito
+            entrada = self.escutar()
             
-            if not text:
+            if not entrada:
                 continue
             
-            # Verificar comandos especiais
-            if text.lower() in ['sair', 'tchau', 'até logo', 'adeus']:
-                print("👋 Encerrando assistente... Até logo!")
-                if modo_voz:
-                    self.speak("Até logo! Foi um prazer conversar com você.")
+            # Comandos especiais
+            entrada_lower = entrada.lower()
+            
+            if entrada_lower in ['tchau', 'até logo', 'adeus', 'sair', 'exit']:
+                despedida = "Tchau! Foi ótimo conversar com você. Até a próxima!"
+                print(f"🤖 Assistente: \"{despedida}\"")
+                self.falar(despedida)
                 break
-            
-            if 'modo texto' in text.lower():
-                modo_voz = False
-                print("🔇 Modo texto ativado.")
+                
+            elif 'modo texto' in entrada_lower or entrada_lower == 'texto':
+                self.modo_voz_ativo = False
+                print("🔇 Modo texto ativado (sem voz)")
+                continue
+                
+            elif 'modo voz' in entrada_lower or entrada_lower == 'voz':
+                self.modo_voz_ativo = True
+                print("🔊 Modo voz ativado")
+                msg = "Pronto, agora posso falar de novo!"
+                print(f"🤖 Assistente: \"{msg}\"")
+                self.falar(msg)
                 continue
             
-            if 'modo voz' in text.lower():
-                modo_voz = True
-                print("🔊 Modo voz ativado.")
-                continue
+            # Processa a mensagem normalmente
+            resposta = self.pensar(entrada)
             
-            # Consultar ChatGPT
-            answer = self.ask_gpt(text)
-            
-            # Responder por voz (se ativado)
-            if modo_voz:
-                self.speak(answer)
+            if resposta:
+                self.falar(resposta)
+
+
+def verificar_configuracao():
+    """Verifica se a API key está configurada"""
+    api_key = os.getenv('OPENAI_API_KEY')
+    
+    if not api_key:
+        print("\n⚠️  Atenção!")
+        print("Você precisa configurar sua API key da OpenAI.")
+        print("\nCrie um arquivo chamado '.env' na mesma pasta com:")
+        print("OPENAI_API_KEY=sua_chave_aqui")
+        print("\nOu execute no terminal:")
+        print("export OPENAI_API_KEY='sua_chave_aqui'")
+        print("\nPara obter uma chave: https://platform.openai.com/api-keys")
+        return False
+    
+    return True
 
 
 def main():
-    """Função principal"""
-    # Verificar se API key está configurada
-    if not os.getenv('OPENAI_API_KEY'):
-        print("❌ ERRO: OPENAI_API_KEY não encontrada!")
-        print("\nCrie um arquivo .env com:")
-        print("OPENAI_API_KEY=sua_chave_aqui")
-        print("\nOu exporte a variável:")
-        print("export OPENAI_API_KEY='sua_chave_aqui'")
-        return
+    """Ponto de entrada do programa"""
+    if not verificar_configuracao():
+        sys.exit(1)
     
     try:
-        assistant = VoiceAssistant()
-        assistant.run()
+        assistente = AssistenteVoz()
+        assistente.executar()
+        
     except KeyboardInterrupt:
-        print("\n\n👋 Assistente encerrado pelo usuário.")
+        print("\n\nEncerrando... Até logo! 👋")
     except Exception as e:
-        print(f"\n❌ Erro: {e}")
+        print(f"\n❌ Ops, algo deu errado: {e}")
+        print("Tente rodar novamente ou verifique sua conexão.")
 
 
 if __name__ == "__main__":
